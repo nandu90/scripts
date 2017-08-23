@@ -1,4 +1,4 @@
-# PHASTA Version 1.6 Input File
+# PHASTA Version 1.6 Input File    -*-perl-*-
 # Here you will
 # find the default values for everything that is allowed to have a
 # default. Some things are not allowed to default and must be entered
@@ -155,16 +155,16 @@ LINEAR SOLVER
 #################################################
 
      Number of GMRES Sweeps per Solve: 1      					# replaces nGMRES
-     Number of Krylov Vectors per GMRES Sweep: 120           	# replaces Kspace
+     Number of Krylov Vectors per GMRES Sweep: 200           	# This is a very high value but will ensure convergence. May make solver slow
      Tolerance on Momentum Equations: 1.0E-05                   # epstol(1)
-     Tolerance on Continuity Equations: 1.0E-04            		# epstol(7)
-     Tolerance on memLS NS Solver: 0.1                 			# epstol(8)
-     Number of Velocity Projection Vectors: 20  				# nPrjs
+     Tolerance on Continuity Equations: 1.0E-04            	# epstol(7)
+     Tolerance on memLS NS Solver: 0.1                 		# epstol(8)
+     Number of Velocity Projection Vectors: 20  		# nPrjs
      Scalar 1 Solver Tolerance: 1.0E-05
      Scalar 2 Solver Tolerance: 1.0E-08
-     Tolerance on ACUSIM Pressure Projection: 1.0E-5 			#0.01
+     Tolerance on ACUSIM Pressure Projection: 1.0E-5 			
      Minimum Number of Iterations per Nonlinear Iteration: 10  	# minIters
-     Maximum Number of Iterations per Nonlinear Iteration: 50 	# maxIters
+     Maximum Number of Iterations per Nonlinear Iteration: 200 	# A very high, conservative, value. Reduce to speed up solver
 
 	 
 ####################################################
@@ -285,35 +285,34 @@ TURBULENCE MODELING PARAMETERS
 
 LEVEL SET MODELING PARAMETERS  
 {
-[C]	Number of Elements Across Interface: 1.8 						#epsilon_ls 
-[C]	Number of Elements Across Interface for Redistancing: 1.8 		#epsilon_lsd
-[C]	Use spatial varying epsilon_ls: 2 								#i_spat_var_eps_flag: 0(off), 1(vol), 2(edge)
-[C]	Apply Volume Constraint: True  									#ivconstraint=1
-[C] Pseudo Time step for Redistancing: 1e-06 						#dtset
+[C]	Number of Elements Across Interface: 1.2 				#epsilon_ls 
+[C]	Number of Elements Across Interface for Redistancing: 1.2 		#epsilon_lsd
+[C]	Use spatial varying epsilon_ls: 2 					#i_spat_var_eps_flag: 0(off), 1(vol), 2(edge)
+[C]	Apply Volume Constraint: True  						#ivconstraint=1
+[C]     Pseudo Time step for Redistancing: 1e-06 				#dtset
 [C]	Base pseudo time step for redistancing on CFL number: 0.75 		#dtlset_cfl
-[C]	Adjust Redistance Velocity to Satisfy CFL Limit: 0.0 			#AdjRedistVelCFL (0-off, nonzero-on)
-[C]	Explicit Solve for Scalar 1 Field: 0 							#iSolvLSSclr1 (0-implicit, 1-explicit)
-[C]	Explicit Solve for Redistance Field: 1 							#iSolvLSSclr2 (0-implicit, 1-explicit)
-[C]	Redistance loop: True 											#i_redist_loop_flag
-[C]	Tolerance for redistance loop: 1e-08 						#redist_toler
-[C]	Maximum number of redistance iterations: 30 					#i_redist_max_iter
+[C]	Adjust Redistance Velocity to Satisfy CFL Limit: 0.0 			#AdjRedistVelCFL. Keep this 0. This will change re-distancing local velocity if not 0
+                                                                                #Instabilities might occur if not 0
+[C]	Explicit Solve for Scalar 1 Field: 0 					#iSolvLSSclr1 (0-implicit, 1-explicit)
+[C]	Explicit Solve for Redistance Field: 1 					#iSolvLSSclr2 (0-implicit, 1-explicit)
+[C]	Redistance loop: True 							#i_redist_loop_flag
+[C]	Tolerance for redistance loop: 1e-08 					#redist_toler
+[C]	Maximum number of redistance iterations: 30 				#i_redist_max_iter
 	
-#	Focus redistancing about interface: 0 							#i_focusredist (0-off, 1-on)
+#	Focus redistancing about interface: 0 					#i_focusredist (0-off, 1-on)
 	Check proximity of interface to large elements: False   		#i_check_prox = 1 (True), 0 (False)
 	Check proximity interface buffer thickness: 0.005       		#r_int_buffer
 	Check proximity maximum element size: 0.010             		#r_int_elem_size
 	Output level set gradient: False								#i_gradphi (=0 for False, =1 for True)	
 
 [C]	Target Constant Void Fraction : 0.010
-[C]	Void Fraction Control Coefficient: 0.01      					#vfcontrcoeff, for Jun's vf control
-[C]	Use Void Fraction Control Coefficient Cap: 0 					#iuse_vfcont_cap, 1 for yes, 0 for no
-[C]	Void Fraction Control Coefficient Cap: 0.00125  				#C_int_cap, interface vel adjustment coefficient cap 	
+[C]	Void Fraction Control Coefficient: 0.01      				#vfcontrcoeff, for Jun's vf control. 0.01 is a good value
+[C]	Use Void Fraction Control Coefficient Cap: 0 				#iuse_vfcont_cap, 1 for yes, 0 for no
+[C]	Void Fraction Control Coefficient Cap: 0.00125  			#C_int_cap, interface vel adjustment coefficient cap 	
 }
 
 
 STEP SEQUENCE
 {
-#     Step Construction: 0 1 0 1 
-#     Step Construction: 0 1 10 11 0 1 10 11 20 21
 [C]      Step Construction: 0 1 10 11 0 1 10 11 0 1 10 11 20 21
 }
