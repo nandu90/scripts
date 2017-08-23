@@ -1,1 +1,1 @@
-qsub -q all.q -pe orte 128 nash.qsub
+qsub -q all.q@compute-0-3.local,all.q@compute-0-4.local -pe orte 128 nash.qsub
