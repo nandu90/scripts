@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+#$ -cwd
+#$ -j y
+#$ -S /bin/bash
+#
+
+/opt/intel/impi/4.1.0.024/intel64/bin/mpirun /home/nsaini3/develop_orig/develop/phasta/phSolver/200_memLS/phSolver/bin/x86_64_linux-icc/phastaIC.exe-mpich2-O   #the_path_to_your_phasta_executable
+
