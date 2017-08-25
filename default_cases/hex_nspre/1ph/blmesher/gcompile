@@ -1,0 +1,4 @@
+gfortran -static -ffixed-form -ffixed-line-length-none -o blmesher blmesher.f
+
+#ifort -O3 -ipo -static -ccdefault none -fixed -132 -o Runme_Average Average.f
+
