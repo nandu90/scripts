@@ -1,0 +1,14 @@
+#!/bin/bash
+export MY_EXEC=../develop_cmake_LMM/
+    cmake \
+    -DCMAKE_C_COMPILER=icc \
+    -DCMAKE_CXX_COMPILER=icpc \
+    -DCMAKE_Fortran_COMPILER=ifort \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DPHASTA_INCOMPRESSIBLE=ON \
+    -DPHASTA_COMPRESSIBLE=OFF \
+    -DPHASTA_BUILD_PHNSPRE=OFF \
+    -DACUSOLVE_LIB=/home/jfang3/svn_develop/develop/LIBLES/lib/x86_64_linux-IB/libles.a \
+    ../develop_cmake_LMM/
+
+    make -j 8
