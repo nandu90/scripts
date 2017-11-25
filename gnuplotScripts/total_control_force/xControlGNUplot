@@ -1,0 +1,8 @@
+set terminal x11
+set title "X control Force"
+set xlabel "Time Step"
+set ylabel "Force (N)"
+set grid ytics lt 0 lw 1 lc rgb "#bbbbbb"
+set grid xtics lt 0 lw 1 lc rgb "#bbbbbb"
+plot "lift-results/total_control_force.dat" u ($0+1):1 w l t "x-control force"
+pause -1 "Hit any key to continue"

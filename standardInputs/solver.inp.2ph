@@ -157,15 +157,15 @@ LINEAR SOLVER
 #     Number of GMRES Sweeps per Solve: 1      					# replaces nGMRES
 #     Number of Krylov Vectors per GMRES Sweep: 200           	# Keep this value uncommented. If Krylov space is too high the solver becomes slow and artificial interfaces are seen.
 	                                                                        # Also the value specified over here does not necessarily equal to the krylov vectors printed out by code. Unresolved mystery?
-     Tolerance on Momentum Equations: 1.0E-05                   # epstol(1)
-     Tolerance on Continuity Equations: 1.0E-04            	# epstol(7)
-     Tolerance on memLS NS Solver: 0.1                 		# epstol(8)
+     Tolerance on Momentum Equations: 1.0E-06                   # epstol(1)
+     Tolerance on Continuity Equations: 1.0E-06            	# epstol(7)
+     Tolerance on memLS NS Solver: 1.0E-05                 		# epstol(8)
      Number of Velocity Projection Vectors: 20  		# nPrjs. I don't know if this is the optimum value but both 10 or 20 seems to be working fine!
-     Scalar 1 Solver Tolerance: 1.0E-05
+     Scalar 1 Solver Tolerance: 1.0E-08
      Scalar 2 Solver Tolerance: 1.0E-08
-     Tolerance on ACUSIM Pressure Projection: 1.0E-5 			
+     Tolerance on ACUSIM Pressure Projection: 1.0E-8 			
      Minimum Number of Iterations per Nonlinear Iteration: 10  	# minIters
-     Maximum Number of Iterations per Nonlinear Iteration: 20 	# Keep this value 20 (or max 50) Increasing it increased the Kryolv space and also caused spurious interfaces. Another unresolve mystery.
+     Maximum Number of Iterations per Nonlinear Iteration: 30 	# Keep this value 20 (or max 50) Increasing it increased the Kryolv space and also caused spurious interfaces. Another unresolve mystery.
 
 	 
 ####################################################
