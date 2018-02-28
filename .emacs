@@ -24,3 +24,6 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Courier 10 Pitch" :foundry "bitstream" :slant normal :weight normal :height 111 :width normal)))))
 (global-linum-mode 1)
+
+(setq c-default-style "linux"
+      c-basic-offset 4)
