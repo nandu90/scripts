@@ -26,7 +26,31 @@
 	integer reclength, lstep, jj, icount, iphase
 	integer istep(1:100), istart, istop
 	integer fout, fin, isn, iread, recl2
+	integer recordcode
+	character*20 vartsFMT
 
+!!!!!!!!!!Required input!!!!!!!!!
+	recordcode = 1
+	
+!!!!!!!!!!!!!!!!!!!!!!!
+
+	 if(recordcode .eq. 0)then !Default - Record everything
+	    vartsFMT='(2I8, I3, 19E15.7)'
+	    vartsFMT=trim(vartsFMT)
+	 else if(recordcode .eq. 1)then !Record only velocities
+	    vartsFMT='(2I8, I3, 4E15.7)'
+	    vartsFMT=trim(vartsFMT)
+	 else if(recordcode .eq. 2)then !Record only LS scalar
+	    vartsFMT='(2I8, I3, 1E15.7)'
+	    vartsFMT=trim(vartsFMT)
+	 else if(recordcode .eq. 3)then !Record velocities and LS scalar
+	    vartsFMT='(2I8, I3, 4E15.7)'
+	    vartsFMT=trim(vartsFMT)
+	 else
+	    write(*,*)"Specify record code between 0-3. Exiting"
+	    call exit(1)
+	 endif
+	   
 ! read the current case path:
 	open(101, file = 'path.dat')
 	 read(101, 50) ipath
@@ -68,73 +92,86 @@
 	reclength = 2*8+3+15*15		! record length
 	recl2 = 1*8 + 4*15  ! merged file rec length
           open(20, file = trim(ipath)//'/varts_run'//MyChar2(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=recl2, access='direct')
+     &     , status='unknown', form='formatted', recl=recl2, access='direct')
 
 ! loop over files:
 	icount = 0
 	do j = 1, Nfiles
-	 write(*,*) 'Processing the step number: ', istep(j) 
-	if (Nrun.gt.9) then
-        if (istep(j).lt.1000) then
-          open(3, file = trim(ipath)//'/varts.'//MyChar3(istep(j))//'.run.'//MyChar2(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-	 else if (istep(j).lt.10000) then
-          open(3, file = trim(ipath)//'/varts.'//MyChar4(istep(j))//'.run.'//MyChar2(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-	 else if (istep(j).lt.100000) then
-          open(3, file = trim(ipath)//'/varts.'//MyChar5(istep(j))//'.run.'//MyChar2(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-	 else
-          open(3, file = trim(ipath)//'/varts.'//MyChar6(istep(j))//'.run.'//MyChar2(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-	 end if
-	else
-        if (istep(j).lt.1000) then
-          open(3, file = trim(ipath)//'/varts.'//MyChar3(istep(j))//'.run.'//MyChar1(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-         else if (istep(j).lt.10000) then
-          open(3, file = trim(ipath)//'/varts.'//MyChar4(istep(j))//'.run.'//MyChar1(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-         else if (istep(j).lt.100000) then
-          open(3, file = trim(ipath)//'/varts.'//MyChar5(istep(j))//'.run.'//MyChar1(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-         else
-          open(3, file = trim(ipath)//'/varts.'//MyChar6(istep(j))//'.run.'//MyChar1(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
-         end if
-	end if
-
-! read/write the information
-         iread = 0
-	 do i = 1, istep(j+1)-istep(j)   ! Loop over number of steps   !/nskip
-          isn = istep(j) + i - 1
-! We check if the step is dividable by Nskip:
-	  fin = 0
-	  if (mod(isn,NSkip).eq.0) fin = 1	  
-	  if (fin) then
-	  iread = iread + 1
-!	 write(*,*) 'start reading time step number : ', isn
-	   do i1 = 1, np
-	  read(3, '(2I8, I3, 15E15.7)', REC=np*(iread-1)+i1)
-     1            lstep,jj,iphase,(varts(k), k=1, 15)
-!	  if (i1.eq.np) write(*,*) i, lstep, isn, jj, iphase
-	  fout = 0
-	  if (lstep.ge.istart.and.lstep.lt.istop) fout = 1
-!	  if (i.eq.100) write(*,*) varts(1:15)
-	  if (fout) then
-	  icount = icount + 1 
-	  write(20,'(1I8, 4E15.7)', REC=icount)
-     1            lstep,(varts(k), k=2, 5) 
-	  end if
-
-	  end do ! i1, np
-	  end if ! fin
-	 end do   ! i, isteps
-	 close(3)
-	end do  ! j, Nfiles
-
+	   write(*,*) 'Processing the step number: ', istep(j) 
+	   if (Nrun.gt.9) then
+	      if (istep(j).lt.1000) then
+		 open(3, file = trim(ipath)//'/varts.'//MyChar3(istep(j))//'.run.'
+     &	      //MyChar2(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      else if (istep(j).lt.10000) then
+		 open(3, file = trim(ipath)//'/varts.'//MyChar4(istep(j))//'.run.'
+     &	      //MyChar2(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      else if (istep(j).lt.100000) then
+		 open(3, file = trim(ipath)//'/varts.'//MyChar5(istep(j))//'.run.'
+     &	      //MyChar2(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      else
+		 open(3, file = trim(ipath)//'/varts.'//MyChar6(istep(j))//'.run.'
+     &	      //MyChar2(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      end if
+	   else
+	      if (istep(j).lt.1000) then
+		 open(3, file = trim(ipath)//'/varts.'//MyChar3(istep(j))//'.run.'
+     &	      //MyChar1(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      else if (istep(j).lt.10000) then
+		 open(3, file = trim(ipath)//'/varts.'//MyChar4(istep(j))//'.run.'
+     &	      //MyChar1(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      else if (istep(j).lt.100000) then
+		 open(3, file = trim(ipath)//'/varts.'//MyChar5(istep(j))//'.run.'
+     &	      //MyChar1(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      else
+		 open(3, file = trim(ipath)//'/varts.'//MyChar6(istep(j))//'.run.'
+     &	      //MyChar1(Nrun)//'.dat', status='unknown', form='formatted')
+!     &		 , recl=reclength, access='direct')
+	      end if
+	   end if
+	   
+!       read/write the information
+	   iread = 0
+	   do i = 1, istep(j+1)-istep(j) ! Loop over number of steps   !/nskip
+	      isn = istep(j) + i - 1
+	     
+!       We check if the step is dividable by Nskip:
+	      fin = 0
+	      if (mod(isn,NSkip).eq.0) fin = 1	  
+	      if (fin) then
+		 iread = iread + 1
+		 do i1 = 1, np
+		    write(*,*) "Point index ",i1
+		    if(recordcode .eq. 0)then
+		       read(3,vartsFMT, REC=np*(iread-1)+i1)lstep,jj,iphase,(varts(k), k=1, 15)
+		    else if(recordcode .eq. 1)then
+		       read(3,vartsFMT,advance="no")lstep,jj,iphase,(varts(k), k=2, 5)
+		    elseif(recordcode .eq. 2)then
+		       read(3,vartsFMT, REC=np*(iread-1)+i1)lstep,jj,iphase,varts(15)
+		    elseif(recordcode .eq .3)then
+		       read(3,vartsFMT, REC=np*(iread-1)+i1)lstep,jj,iphase,(varts(k), k=2, 4),varts(15)
+		    endif
+		    fout = 0
+		    if (lstep.ge.istart.and.lstep.lt.istop) fout = 1
+		    if (fout) then
+		       icount = icount + 1 
+		       write(20,'(1I8, 4E15.7)', REC=icount)lstep,(varts(k), k=2, 5) 
+		    end if
+		     write(*,*)"Processed step number: ",lstep
+		 end do		! i1, np
+	      end if		! fin
+	   end do		! i, isteps
+	   close(3)
+	end do			! j, Nfiles
+	
 	close(20)
-
+	
 	end program Merge1 
 
 
