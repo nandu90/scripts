@@ -4,7 +4,20 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
+; start package.el with emacs
+(require 'package)
+; add MELPA to repository list
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+; initialize package.el
 (package-initialize)
+; start auto-complete with emacs
+(require 'auto-complete)
+; do default config for auto-complete
+(require 'auto-complete-config)
+(ac-config-default)
+; start yasnippet with emacs
+(require 'yasnippet)
+(yas-global-mode 1)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -26,4 +39,4 @@
 (global-linum-mode 1)
 
 (setq c-default-style "linux"
-      c-basic-offset 4)
+     c-basic-offset 4)
