@@ -6,10 +6,10 @@
 Current run number:
         1
 Time sample range in the output
-        0
-        100
+        18500
+        19500
 Number of files to merge:
         1
 Timesamples range (#files + 1):
 	0
-	100
+	1000

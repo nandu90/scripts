@@ -20,7 +20,7 @@
 	character*80 ipath
         character*80 filenum
 
-	integer, parameter :: mp = 20000
+	integer, parameter :: mp = 40000
 
 	real tol, varts(1:20), ctime, tstart, tstop
 	real xx(1:mp), yy(1:mp), zz(1:mp)
@@ -31,7 +31,7 @@
 	integer reclength, lstep, jj, icount, iphase
 	integer istep(1:100), istart, istop
 	integer fout, fin, isn, iread
-	integer nbct, mbct, ioverlap
+	integer nbct, mbct, ioverlap, divisor
 	
 ! read the current case path:
 	open(101, file = 'path.dat')
@@ -61,7 +61,8 @@
         read(1,*) ioverlap
 	
 	close(1)
-	
+
+	write(*,*)"Done reading vbct.inp"
 	j = 1
 	istep(j) = istart
 
@@ -69,12 +70,15 @@
 	open(2, file = trim(ipath)//'/xyzts.dat')
 	
 	read(2, *) np, nskip, tol, nd1, nd2, NRun
+	write(*,*) np, nskip, tol, nd1, nd2, NRun
 ! Read the point coordinates:
 	 do i = 1, np
-	  read(2, *) xx(i), yy(i), zz(i)
+	    read(2, *) xx(i), yy(i), zz(i)
+	    !write(*,*)i
 	 end do
 	close(2)
 
+	write(*,*)"Done reading xyzts"
 	write(*,*) 'Number of points per step = ', np
 
 	write(*,*) 'Processing run #', Nrun
@@ -87,81 +91,107 @@
 ! loop over files:
 	icount = 0
 	 write(*,*) 'Processing the run number: ', Nrun 
-          open(3, file = trim(ipath)//'/varts_run'//MyChar2(Nrun)//'.dat'
-     1     , status='unknown', form='formatted', recl=reclength, access='direct')
+          open(3, file = trim(ipath)//'/varts_run'
+     &     //MyChar2(Nrun)//'.dat',status='unknown', form='formatted',
+     &       recl=reclength, access='direct')
 
 ! read/write the information
          iread = 0
 	 ts1(1) = 1
+	 !write(*,*)"here1"
 	 do i2 = 1, nbct
-	 if (i2.lt.nbct) then
-		maxts(i2) = nint(deltat/phdt)
-	  else
-		maxts(i2) = mod(istop - istart, maxts(i2-1))
-	 end if
-	 ts2(i2) = ts1(i2) + maxts(i2) - 1
-! Expand the timestep range to provide slight overlap:
-	 if (i2.eq.1) then
-	   ts2(i2) = ts2(i2) + ioverlap
-	 else if (i2.eq.nbct) then
-	   ts1(i2) = ts1(i2) - ioverlap
-	 else
-           ts1(i2) = ts1(i2) - ioverlap
-           ts2(i2) = ts2(i2) + ioverlap
+	    !write(*,*)"here2"
+	    if (i2.lt.nbct) then
+	       maxts(i2) = int(deltat/phdt)
+	    else
+!       write(*,*)"here3"
+	       if(nbct.ne. 1)then
+		  divisor = int((istop-istart)/maxts(1))
+		  if(divisor .eq. nbct)then
+		     maxts(i2) =  int(deltat/phdt)
+		  else
+		     maxts(i2) = mod(istop - istart, maxts(i2-1))
+		  endif
+	       else
+		  maxts(i2) = int(deltat/phdt)
+	       endif
+	       !maxts(i2) = istop - istart
+	       !
+	    end if
+	    
+	    ts2(i2) = ts1(i2) + maxts(i2) - 1
+	    write(*,*)maxts(i2), ts1(i2), ts2(i2)
+!       Expand the timestep range to provide slight overlap:
+	    if (i2.eq.1) then
+	       ts2(i2) = ts2(i2) + ioverlap
+	    else if (i2.eq.nbct) then
+	       ts1(i2) = ts1(i2) - ioverlap
+	    else
+	       ts1(i2) = ts1(i2) - ioverlap
+	       ts2(i2) = ts2(i2) + ioverlap
 	 end if
 	 write(*,*) 'File ', i2, ' range is timesteps: ', ts1(i2), ts2(i2)
 	 ts1(i2+1) = ts1(i2) + maxts(i2)
-	 end do
+	end do
+
+
+	
         ctime = 0.0
-! Loop over bct.dat files:
+!       Loop over bct.dat files:
 	do mbct = 1, nbct
-	 write(*,*) 'Processing file #', mbct, ' of ', nbct
-                 if( mbct.ge.0 .and. mbct.le.9)then
-                    write(filenum,'(i1.1)')mbct
-                 else if(mbct.ge.10 .and. mbct.le.99)then
-                    write(filenum,'(i2.2)')mbct
-                 else if(mbct.ge.100 .and. mbct.le.999)then
-                    write(filenum,'(i3.3)')mbct
-                 else if(mbct.ge.1000 .and. mbct.le.9999)then
-                    write(filenum,'(i4.4)')mbct
-                 end if
-         open(20+mbct, file = trim(ipath)//'/bct.'//trim(filenum)//'.dat'
-     1     , status='unknown')
-	 write(20+mbct, 13) np, ts2(mbct) - ts1(mbct) + 1   !, maxts(mbct) 
-! Loop over points:
-     	do i1 = 1, np
-         ctime = real(ts1(mbct)-1)*phdt
-	!if (mod(i, 50).eq.0)write(*,*) 'Point ', i1, ' out of ', np
-	 do i = ts1(mbct), ts2(mbct)   ! Loop over number of steps   
-	  read(3, 11, REC=np*(i-1)+i1)
-     1            lstep,(varts(k), k=2, 5)
-! Record the point coordinates and the number of time steps
-	  if (i.eq.ts1(mbct)) then
-          write(20+mbct, 12) xx(i1), yy(i1), zz(i1), ts2(mbct) - ts1(mbct) + 1   !, maxts(mbct)
-	  end if
-! Accumulate time:
-	  if (i.gt.1) ctime = ctime + varts(5)
-	  fout = 0
-	  if (ctime.ge.tstart.and.ctime.lt.tstop) fout = 1
-	  if (fout) then
-	  icount = icount + 1 
-	  write(20+mbct,10) varts(2:4), ctime  !, i1, i, lstep, jj, iphase 
-	  end if
-
-	 end do   ! i, isteps
-         end do ! i1, np
-	 close(20+mbct)
-	end do ! mbct, nbct
-
-	 close(3)
-
+	   write(*,*) 'Processing file #', mbct, ' of ', nbct
+	   if( mbct.ge.0 .and. mbct.le.9)then
+	      write(filenum,'(i1.1)')mbct
+	   else if(mbct.ge.10 .and. mbct.le.99)then
+	      write(filenum,'(i2.2)')mbct
+	   else if(mbct.ge.100 .and. mbct.le.999)then
+	      write(filenum,'(i3.3)')mbct
+	   else if(mbct.ge.1000 .and. mbct.le.9999)then
+	      write(filenum,'(i4.4)')mbct
+	   else
+	      write(*,*)"Error"
+	      call exit(1)
+	   end if
+	   open(20+mbct, file = trim(ipath)//'/bct.'//trim(filenum)//'.dat', status='unknown')
+	   write(20+mbct, 13) np, ts2(mbct) - ts1(mbct) + 1 !, maxts(mbct) 
+!       Loop over points:
+	   write(*,*)ts1(mbct), ts2(mbct), phdt
+	   write(*,*)tstart,tstop
+	   !call exit(1)
+	   do i1 = 1, np
+	      write(*,*)"At point number ",i1
+	      icount = 0
+	      !ctime = real(ts1(mbct)-1)*phdt
+	      ctime = tstart
+	      do i = ts1(mbct), ts2(mbct)   
+		 read(3, 11, REC=np*(i-1)+i1)lstep,(varts(k), k=2, 5)
+		 if (i.eq.ts1(mbct)) then
+		    write(20+mbct, 12) xx(i1), yy(i1), zz(i1), ts2(mbct) - ts1(mbct) + 1 
+		 end if
+		 if (i.gt.1) ctime = ctime + varts(5)
+		 fout = 0
+		 if (ctime.ge.tstart.and.ctime.lt.tstop) fout = 1
+		 if (fout) then
+		    icount = icount + 1 
+		    write(20+mbct,10) varts(2:4), ctime !, i1, i, lstep, jj, iphase
+		    !write(20+mbct,10) varts(2:5)
+		 end if
+		 
+	      end do		! i, isteps
+	      write(*,*)"Number of time steps written ",icount
+	   end do		! i1, np
+	   close(20+mbct)
+	end do			! mbct, nbct
+	      
+	close(3)
+	
 	close(20)
-
-10	format(1x, 4E15.7, 10I10)
-11	format(1x, I8, 4E15.7)
-12	format(1x, 3E15.7, I10)
-13      format(1x, 2I10)
-        end program
+	
+ 10	format(1x, 4E15.7, 10I10)
+ 11	format(1x, I8, 4E15.7)
+ 12	format(1x, 3E15.7, I10)
+ 13	format(1x, 2I10)
+	end program
 
 
 	character*(1) function MYCHAR1(i)
