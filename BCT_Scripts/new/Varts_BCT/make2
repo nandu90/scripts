@@ -1,0 +1,1 @@
+ifort -debug all -ccdefault none -fixed -132 -o run2 Varts_BCTnew.f

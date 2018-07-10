@@ -1,0 +1,1 @@
+ifort -debug inline-debug-info -ccdefault none -fixed -132 -o run3 bct_partitionNew.f

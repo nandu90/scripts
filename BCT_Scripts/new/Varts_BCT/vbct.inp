@@ -1,0 +1,11 @@
+
+
+
+#Set end time to slightly higher value than in your PHASTA output
+
+Start Simulation Time, End Simulation Time:
+        0
+        2.169E-05
+	2.269E-05
+	5.5E-05
+
