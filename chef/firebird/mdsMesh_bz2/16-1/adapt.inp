@@ -1,0 +1,24 @@
+timeStepNumber 0
+ensa_dof 5
+attributeFileName ../Simplified_SPJ_file/geom.spj
+modelFileName ../geom.smd
+meshFileName bz2:../simMeshToMdsMesh/mdsMesh_bz2/
+outMeshFileName bz2:mdsMesh_out_bz2/
+adaptFlag 0
+AdaptStrategy 7
+RecursiveUR 1
+splitFactor 16
+# elementsPerMigration 100000
+SolutionMigration 0
+DisplacementMigration 0
+Tetrahedronize 0
+partitionMethod graph
+# LocalPtn = {0:global,1:local}
+LocalPtn 1
+# ParmaPtn = {0:off,1:on}
+ParmaPtn 1
+elementImbalance 1.01
+vertexImbalance 1.01
+dwalMigration 0
+buildMapping 1
+initBubbles 0
