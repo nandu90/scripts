@@ -1,2 +1,2 @@
-ifort -debug all -ccdefault none -fixed -132 -o Runme_Coin Coin.f
+ifort -debug all -ccdefault none -fixed -132 -o Runme_Coin newCoin.f
 

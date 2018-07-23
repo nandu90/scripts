@@ -175,10 +175,6 @@ c     --------------------------------------------------------
                   y_p = y(j)
                   z_p = z(j)
 
-                  if(sqrt((y_p+0.00611)**2.0+(z_p-0.000452)**2.0) .le. 1e-5)then
-                     write(*,*)"The rank is: ",myrank,j
-                  endif
-                  
                   write(40, "(1x, 3E15.7, I10)")x_p, y_p, z_p, nts
                   flag = 0
                   do k=1,np

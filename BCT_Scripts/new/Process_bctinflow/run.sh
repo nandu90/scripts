@@ -9,8 +9,8 @@
 
 echo "Generating myrank.txt and xyzts.dat"
 
-#mkdir bct
-#mv bct.dat.* bct/
+mkdir bct
+mv bct.dat.* bct/
 
 ls bct > myrank.txt
 

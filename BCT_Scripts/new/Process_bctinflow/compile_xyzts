@@ -1,2 +1,2 @@
-ifort -debug all -ccdefault none -fixed -132 -o xyzts gen_xyzts.f
+ifort -debug all -ccdefault none -fixed -132 -o xyzts newgen_xyzts.f
 
