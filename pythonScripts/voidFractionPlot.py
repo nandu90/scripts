@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,6 +20,15 @@ with open("1703727.output","r") as f:
             timestep.append(int(temparr[0]))
             tempstr = temparr[3].replace("%;","")
             vf.append(float(tempstr))
+
+plt.title('Void Fraction Evolution',fontsize=14,fontweight='bold')
+plt.xlabel('Time Step',fontsize=12,fontweight='bold')
+plt.ylabel('% Void Fraction',fontsize=12,fontweight='bold')
+plt.plot(timestep, vf,'-b',linewidth=1.0,label='no LTS, CFL = 0.9')
+plt.legend(loc='upper right')
+plt.grid()
+#plt.show()
+plt.savefig('plot.png',bbox_inches='tight',dpi=400)
             
         
             
