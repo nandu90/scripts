@@ -40,3 +40,5 @@
 
 (setq c-default-style "linux"
      c-basic-offset 4)
+
+(show-paren-mode 1)
